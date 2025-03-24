@@ -692,11 +692,11 @@ local speedRadius = Tab:CreateToggle({
                     end
                     local char = game.Players.LocalPlayer.Character
                     if char then
-                        local arm = char:FindFirstChild("Arm1")
+                        local arm = char:FindFirstChild("arm1")
                         if arm then
-                            local hand = arm:FindFirstChild("Hand")
+                            local hand = arm:FindFirstChild("hand")
                             if hand then
-                                local hand2 = hand:FindFirstChild("Hand")
+                                local hand2 = hand:FindFirstChild("hand")
                                 if hand2 then
                                     hand2:Destroy()
                                 end
