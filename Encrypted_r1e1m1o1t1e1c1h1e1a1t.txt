@@ -674,54 +674,40 @@ game:GetService("ReplicatedStorage").remotes.abilities:FireServer(unpack(args))
 })
 
 local ToggleActive = false
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-
-local function CheckHandExists()
-    local arm1 = character:FindFirstChild("arm1")
-    if arm1 then
-        local hand = arm1:FindFirstChild("hand")
-        return hand ~= nil
-    end
-    return false
-end
-
-local function ClearHandChildren()
-    local arm1 = character:FindFirstChild("arm1")
-    if arm1 then
-        local hand = arm1:FindFirstChild("hand")
-        if hand then
-            for _, child in ipairs(hand:GetChildren()) do
-                child:Destroy()
-            end
-        end
-    end
-end
-
 local speedRadius = Tab:CreateToggle({
-   Name = "Lag Everyone (Blaze)",
-   CurrentValue = false,
-   Flag = "Toggle1",
-   Callback = function(Value)
-       ToggleActive = Value
-       if ToggleActive then
-           spawn(function()
-               while ToggleActive do
-                   if CheckHandExists() then
-                       ClearHandChildren()
-                   end
-                   for i = 1, 10 do
-                       local args = {
-                           [1] = "setHeatWaveParticles",
-                           [2] = "punch"
-                       }
-                       game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(args))
-                   end
-                   task.wait()
-               end
-           end)
-       end
-   end,
+    Name = "Lag Everyone (Blaze)",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        ToggleActive = Value
+        if ToggleActive then
+            spawn(function()
+                while ToggleActive do
+                    for i = 1, 10 do
+                        local args = {
+                            [1] = "setHeatWaveParticles",
+                            [2] = "punch"
+                        }
+                        game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("abilities"):FireServer(unpack(args))
+                    end
+                    local char = game.Players.LocalPlayer.Character
+                    if char then
+                        local arm = char:FindFirstChild("Arm1")
+                        if arm then
+                            local hand = arm:FindFirstChild("Hand")
+                            if hand then
+                                local hand2 = hand:FindFirstChild("Hand")
+                                if hand2 then
+                                    hand2:Destroy()
+                                end
+                            end
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end,
 })
 
 local Paragraph = Tab:CreateParagraph({Title = "[❓] Enable Abilities No Countdown Req.", Content = "You Need Click DEAD RIGHT NOW, and be exe, then toggle ABILITIES NO COUNTDOWN from SONIC.EXE AND MINIONS\nLet fun with abilities no countdown!"})
