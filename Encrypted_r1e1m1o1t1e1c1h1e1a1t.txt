@@ -683,7 +683,7 @@ local speedRadius = Tab:CreateToggle({
         if ToggleActive then
             spawn(function()
                 while ToggleActive do
-                    for i = 1, 50 do
+for i = 1, 2 do
                         local args = {
                             [1] = "setHeatWaveParticles",
                             [2] = "punch"
