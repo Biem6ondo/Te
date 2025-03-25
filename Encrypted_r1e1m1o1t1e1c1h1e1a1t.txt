@@ -1523,6 +1523,7 @@ button.Text = "Run"
 button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 button.Draggable = true
 button.Active = true
+button.Visible = false
 
 local function stopCurrentAnimation(humanoid)
     if currentAnimation then
