@@ -1562,6 +1562,12 @@ local function jumpCharacter()
     end
 end
 
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.Space then
+        jumpCharacter()
+    end
+end)
+
 if jumpBtn then
     jumpBtn.MouseButton1Click:Connect(jumpCharacter)
 end
