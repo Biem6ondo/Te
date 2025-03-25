@@ -1521,6 +1521,7 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local runService = game:GetService("RunService")
 local userInputService = game:GetService("UserInputService")
 
+local speed = 5
 local tpwalking = true
 local gravitySpeed = 0.5
 local anchoredState = false
@@ -1528,97 +1529,124 @@ local gravityEnabled = true
 local jumpEnabled = true
 local tpwalkEnabled = true
 
-humanoidRootPart.Anchored = true
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+gui.ResetOnSpawn = true
 
-local jumpBtn
+local speedLabel = Instance.new("TextLabel", gui)
+speedLabel.Size = UDim2.new(0, 200, 0, 50)
+speedLabel.Position = UDim2.new(0.5, -100, 0.1, 0)
+speedLabel.BackgroundTransparency = 0.5
+speedLabel.TextScaled = true
+speedLabel.Visible = false
+speedLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedLabel.Font = Enum.Font.SourceSansBold
+
+local function toggleAnchoredState()
+    anchoredState = not anchoredState
+    humanoidRootPart.Anchored = anchoredState
+    gravityEnabled = anchoredState
+    jumpEnabled = anchoredState
+    tpwalkEnabled = anchoredState
+    print(anchoredState and "HumanoidRootPart Anchored: ON" or "HumanoidRootPart Anchored: OFF")
+end
 
 if userInputService.TouchEnabled then
-    local touchGui = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("TouchGui")
-    if touchGui then
-        jumpBtn = touchGui:FindFirstChild("TouchControlFrame") and touchGui.TouchControlFrame:FindFirstChild("JumpButton")
-    end
-end
+    print("You are mobile")
 
-local function isOnGround()
-    local rayOrigin = humanoidRootPart.Position
-    local rayDirection = Vector3.new(0, -3.5, 0)
-    local raycastParams = RaycastParams.new()
-    raycastParams.FilterDescendantsInstances = {character}
-    raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+    local speedBox = Instance.new("TextBox", gui)
+    speedBox.Size = UDim2.new(0, 200, 0, 50)
+    speedBox.Position = UDim2.new(0.5, -100, 0.2, 0)
+    speedBox.PlaceholderText = "Enter Speed"
+    speedBox.Text = ""
+    speedBox.ClearTextOnFocus = true
+    speedBox.BackgroundTransparency = 0.3
+    speedBox.BorderSizePixel = 0
+    speedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    speedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    speedBox.Font = Enum.Font.SourceSansBold
 
-    local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)  
-    return raycastResult ~= nil
-end
+    local corner = Instance.new("UICorner", speedBox)
+    corner.CornerRadius = UDim.new(0, 10)
 
-local function jumpCharacter()
-    if jumpEnabled and humanoid and humanoidRootPart then
-        character:TranslateBy(Vector3.new(0, 15, 0))
-        task.wait(0.2)
+    local applyBtn = Instance.new("TextButton", gui)
+    applyBtn.Size = UDim2.new(0, 200, 0, 50)
+    applyBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
+    applyBtn.Text = "Apply Speed"
+    applyBtn.BackgroundTransparency = 0.3
+    applyBtn.BorderSizePixel = 0
+    applyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    applyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    applyBtn.Font = Enum.Font.SourceSansBold
 
-        while gravityEnabled and not isOnGround() do  
-            character:TranslateBy(Vector3.new(0, -gravitySpeed, 0))  
-            task.wait(0.02)  
-        end  
-    end
-end
+    local corner2 = Instance.new("UICorner", applyBtn)
+    corner2.CornerRadius = UDim.new(0, 10)
 
-userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.Space then
-        jumpCharacter()
-    end
-end)
+    applyBtn.MouseButton1Click:Connect(function()
+        local newSpeed = tonumber(speedBox.Text)
+        if newSpeed and newSpeed > 0 then
+            speed = newSpeed
+            speedLabel.Text = "Speed: " .. speed
+            speedLabel.Visible = true
+            task.wait(1)
+            speedLabel.Visible = false
+        end
+    end)
 
-if jumpBtn then
-    jumpBtn.MouseButton1Click:Connect(jumpCharacter)
+    local toggleBtn = Instance.new("TextButton", gui)
+    toggleBtn.Size = UDim2.new(0, 200, 0, 50)
+    toggleBtn.Position = UDim2.new(0, 0, 0.4, 0)
+    toggleBtn.Text = "Disabled"
+    toggleBtn.BackgroundTransparency = 0.3
+    toggleBtn.BorderSizePixel = 0
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleBtn.Font = Enum.Font.SourceSansBold
+
+    local corner3 = Instance.new("UICorner", toggleBtn)
+    corner3.CornerRadius = UDim.new(0, 10)
+
+    toggleBtn.MouseButton1Click:Connect(function()
+        toggleAnchoredState()
+        toggleBtn.Text = anchoredState and "Enabled" or "Disabled"
+    end)
+else
+    print("You are computer")
+
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "Speed Control",
+        Text = "Press V + Scroll (Down, Up) to (Decrease, Increase) Speed", V to Toggle,
+        Duration = 5
+    })
+
+    userInputService.InputChanged:Connect(function(input)
+        if userInputService:IsKeyDown(Enum.KeyCode.V) and (input.UserInputType == Enum.UserInputType.MouseWheel) then
+            if input.Position.Z > 0 then
+                speed = math.min(speed + 1, 100)
+            else
+                speed = math.max(speed - 1, 1)
+            end
+
+            speedLabel.Text = "Speed: " .. speed
+            speedLabel.Visible = true
+
+            task.wait(1)
+            speedLabel.Visible = false
+        end
+    end)
+
+    userInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == Enum.KeyCode.V then
+            toggleAnchoredState()
+        end
+    end)
 end
 
 runService.Heartbeat:Connect(function(delta)
     if tpwalkEnabled and tpwalking and humanoid and humanoid.MoveDirection.Magnitude > 0 then
-        character:TranslateBy(humanoid.MoveDirection * 5 * delta * 10)
+        character:TranslateBy(humanoid.MoveDirection * speed * delta * 10)
     end
 end)
-
-userInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.V then
-        anchoredState = not anchoredState
-        humanoidRootPart.Anchored = anchoredState
-
-        gravityEnabled = anchoredState
-        jumpEnabled = anchoredState
-        tpwalkEnabled = anchoredState
-
-        print(anchoredState and "HumanoidRootPart Anchored: ON" or "HumanoidRootPart Anchored: OFF")
-    end
-end)
-
-if userInputService.TouchEnabled then
-    local screenGui = Instance.new("ScreenGui", player.PlayerGui)
-
-    local toggleBtn = Instance.new("TextButton", screenGui)
-    toggleBtn.Size = UDim2.new(0, 200, 0, 50)
-    toggleBtn.Position = UDim2.new(0, 0, 0.4, 0)
-    toggleBtn.Text = "Disabled"
-
-    toggleBtn.MouseButton1Click:Connect(function()
-        anchoredState = not anchoredState
-        humanoidRootPart.Anchored = anchoredState
-
-        gravityEnabled = anchoredState
-        jumpEnabled = anchoredState
-        tpwalkEnabled = anchoredState
-
-        toggleBtn.Text = anchoredState and "Disabled" or "Enabled"
-        print(anchoredState and "HumanoidRootPart Anchored: ON" or "HumanoidRootPart Anchored: OFF")
-    end)
-end
-
-local function moveCharacter()
-    if gravityEnabled and not isOnGround() then
-        humanoidRootPart.CFrame = humanoidRootPart.CFrame * CFrame.new(0, -gravitySpeed, 0)
-    end
-end
-
-runService.RenderStepped:Connect(moveCharacter)
 end,
 })
 
