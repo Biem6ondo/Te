@@ -1530,7 +1530,14 @@ local tpwalkEnabled = true
 
 humanoidRootPart.Anchored = true
 
-local jumpBtn = player.PlayerGui.TouchGui.TouchControlFrame:FindFirstChild("JumpButton")
+local jumpBtn
+
+if userInputService.TouchEnabled then
+    local touchGui = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("TouchGui")
+    if touchGui then
+        jumpBtn = touchGui:FindFirstChild("TouchControlFrame") and touchGui.TouchControlFrame:FindFirstChild("JumpButton")
+    end
+end
 
 local function isOnGround()
     local rayOrigin = humanoidRootPart.Position
@@ -1605,9 +1612,7 @@ local function moveCharacter()
     end
 end
 
-game:GetService("RunService").RenderStepped:Connect(function()
-    moveCharacter()
-end)
+runService.RenderStepped:Connect(moveCharacter)
 end,
 })
 
