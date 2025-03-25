@@ -2185,6 +2185,14 @@ end)
 
 print("Disabled welcome notify because is suck")
 
+local userInputService = game:GetService("UserInputService")
+
+if userInputService.TouchEnabled then
+    print("You are mobile")
+else
+    print("You are computer")
+end
+
 end
 
 task.defer(function()
