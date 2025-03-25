@@ -1529,8 +1529,6 @@ local gravityEnabled = true
 local jumpEnabled = true
 local tpwalkEnabled = true
 
-humanoidRootPart.Anchored = true
-
 local function isOnGround()
     local rayOrigin = humanoidRootPart.Position
     local rayDirection = Vector3.new(0, -3.5, 0)
@@ -1579,7 +1577,7 @@ if userInputService.TouchEnabled then
 
     local speedBox = Instance.new("TextBox", gui)
     speedBox.Size = UDim2.new(0, 200, 0, 50)
-    speedBox.Position = UDim2.new(0.5, -100, 0.7, 0)
+    speedBox.Position = UDim2.new(0.5, 0, 0, 0)
     speedBox.PlaceholderText = "Enter Speed"
     speedBox.Text = ""
     speedBox.ClearTextOnFocus = true
@@ -1588,13 +1586,14 @@ if userInputService.TouchEnabled then
     speedBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     speedBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     speedBox.Font = Enum.Font.SourceSansBold
+speedBox.AnchorPoint = Vector2.new(0.5, 0.5)
 
     local corner = Instance.new("UICorner", speedBox)
     corner.CornerRadius = UDim.new(0, 10)
 
     local applyBtn = Instance.new("TextButton", gui)
     applyBtn.Size = UDim2.new(0, 200, 0, 50)
-    applyBtn.Position = UDim2.new(0.5, -100, 0.2, 0)
+    applyBtn.Position = UDim2.new(0.5, 0, 0.08, 0)
     applyBtn.Text = "Apply Speed"
     applyBtn.BackgroundTransparency = 0.3
     applyBtn.BorderSizePixel = 0
@@ -1602,6 +1601,7 @@ if userInputService.TouchEnabled then
     applyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     applyBtn.Font = Enum.Font.SourceSansBold
 applyBtn.TextScaled = true
+applyBtn.AnchorPoint = Vector2.new(0.5, 0.5)
 
     local corner2 = Instance.new("UICorner", applyBtn)
     corner2.CornerRadius = UDim.new(0, 10)
