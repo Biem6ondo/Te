@@ -1509,6 +1509,92 @@ end)
 end,
 })
 
+local player = game.Players.LocalPlayer
+local defaultSpeed = 16
+local runSpeed = 35
+local currentAnimation
+
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+local button = Instance.new("TextButton", screenGui)
+
+button.Size = UDim2.new(0, 100, 0, 50)
+button.Position = UDim2.new(0.5, -50, 0.1, 0)
+button.Text = "Run"
+button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+button.Draggable = true
+button.Active = true
+
+local function stopCurrentAnimation(humanoid)
+    if currentAnimation then
+        currentAnimation:Stop()
+        currentAnimation = nil
+    end
+end
+
+local function setupCharacter(char)
+    local humanoid = char:FindFirstChildOfClass("Humanoid")
+    local rootPart = char:FindFirstChild("HumanoidRootPart")
+
+    if humanoid and rootPart then
+        stopCurrentAnimation(humanoid)
+
+        local selection = workspace.game.selectionIntro.positions.survivors
+        local targetPos
+
+        for i = 1, 7 do
+            local part = selection:FindFirstChild("player" .. i)
+            if part and #part:GetChildren() == 0 then
+                targetPos = part.Position
+                break
+            end
+        end
+
+        if targetPos then
+            rootPart.CFrame = CFrame.new(targetPos.X, 2, 113)
+            humanoid.WalkSpeed = runSpeed
+
+            local animRun = Instance.new("Animation")
+            animRun.AnimationId = "rbxassetid://76389912099262"
+            currentAnimation = humanoid:LoadAnimation(animRun)
+            currentAnimation:Play()
+
+            humanoid:MoveTo(targetPos)
+
+            humanoid.MoveToFinished:Connect(function()
+                stopCurrentAnimation(humanoid)
+                local animIdle = Instance.new("Animation")
+                animIdle.AnimationId = "rbxassetid://114478970530288"
+                currentAnimation = humanoid:LoadAnimation(animIdle)
+                currentAnimation:Play()
+                humanoid.WalkSpeed = defaultSpeed
+            end)
+        end
+    end
+end
+
+button.MouseButton1Click:Connect(function()
+    if player.Character then
+        setupCharacter(player.Character)
+    end
+end)
+
+local part = Instance.new("Part", workspace)
+part.Size = Vector3.new(13, 408, 133)
+part.Position = Vector3.new(-187.25, -7.018, -39.75)
+part.Transparency = 1
+part.CanCollide = true
+part.Anchored = true
+part.Rotation = Vector3.new(90, 90, 0)
+
+Tab:CreateToggle({
+Name = "Show Me On SelectionIntro",
+CurrentValue = false,
+Flag = "hhhhhhh",
+Callback = function(Value)
+button.Visible = Value
+end,
+})
+
 local Tab = Window:CreateTab("Misc", 18683003750)
 
 Tab:CreateButton({
