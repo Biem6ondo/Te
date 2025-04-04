@@ -1159,7 +1159,7 @@ local Dropdown = Tab:CreateDropdown({
 Tab:CreateButton({
 Name = "No fog",
 Callback = function()
-while wait(0.4) do
+while wait(0.05) do
 game.Lighting.atmosphere.Density = 0
 game.Lighting.blur.Enabled = false
 game.Lighting.bloom.Enabled = false
@@ -1828,6 +1828,14 @@ runService.Heartbeat:Connect(function(delta)
                 character:TranslateBy(Vector3.new(0, 4.5, 0))
                 character:TranslateBy(direction * moveDistance)
             end
+        end
+
+        local bottomOrigin = rootPos
+        local downRay = workspace:Raycast(bottomOrigin, Vector3.new(0, -3, 0), raycastParams)
+
+        if downRay and downRay.Position.Y > rootPos.Y - 2 then
+        
+            character:TranslateBy(Vector3.new(0, 4, 0))
         end
     end
 end)
