@@ -462,6 +462,9 @@ local LocalPlayer = Players.LocalPlayer
 local renderConnection
 local loopThread
 local lastPingHigh = nil
+local lastTarget = nil
+local pingCheckCooldown = 0
+local useHeartbeat = false
 
 local function getHRP(char)
     return char and char:FindFirstChild("HumanoidRootPart")
@@ -484,7 +487,7 @@ local function getClosestDownedPlayer(maxDistance)
     if not displayPlayers then return nil end
 
     local closestPlayer = nil
-    local shortestDistance = maxDistance or 50
+    local shortestDistance = maxDistance or 15
 
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
@@ -494,14 +497,9 @@ local function getClosestDownedPlayer(maxDistance)
                 local dist = (myHRP.Position - hrp.Position).Magnitude
                 if dist <= shortestDistance then
                     local disp = displayPlayers:FindFirstChild(player.Name)
-                    if disp and disp:FindFirstChild("health") then
-                        local health = disp.health.Value
-                        if health == 0 then
-                            shortestDistance = dist
-                            closestPlayer = player
-                        else
-                            print("Player", player.Name, "Health:", health, "> 0, Don't Revive!")
-                        end
+                    if disp and disp:FindFirstChild("health") and disp.health.Value == 0 then
+                        shortestDistance = dist
+                        closestPlayer = player
                     end
                 end
             end
@@ -510,8 +508,8 @@ local function getClosestDownedPlayer(maxDistance)
     return closestPlayer
 end
 
-LocalPlayer.CharacterAdded:Connect(function(char)
-    char:WaitForChild("HumanoidRootPart", 5)
+LocalPlayer.CharacterAdded:Connect(function()
+    task.wait(1)
     print("Updated HumanoidRootPart from", LocalPlayer.Name)
 end)
 
@@ -524,18 +522,28 @@ displayPlayers.ChildRemoved:Connect(function(child)
 end)
 
 local function fireRevive()
-    local target = getClosestDownedPlayer(50)
-    if target then
-        local targetChar = target.Character or workspace:FindFirstChild(target.Name)
-        if targetChar then
-            local disp = displayPlayers:FindFirstChild(target.Name)
-            local health = disp and disp:FindFirstChild("health") and disp.health.Value or "Unknown"
-            print("Approached", target.Name, "and Health:", health, "Started Reviving")
-            local args = {
-                [1] = "revive",
-                [2] = targetChar
-            }
-            ReplicatedStorage:WaitForChild("remotes"):WaitForChild("actions"):FireServer(unpack(args))
+    for _ = 1, 50 do
+        local target = getClosestDownedPlayer(15)
+        if target ~= lastTarget then
+            if target then
+                local disp = ReplicatedStorage.displayPlayers:FindFirstChild(target.Name)
+                local health = disp and disp:FindFirstChild("health") and disp.health.Value or "Unknown"
+                print("Approached", target.Name, "Health:", health, "Started Reviving")
+            elseif lastTarget then
+                print("Moved away from", lastTarget.Name, "No longer reviving")
+            end
+            lastTarget = target
+        end
+
+        if target then
+            local char = target.Character or workspace:FindFirstChild(target.Name)
+            if char then
+                local args = {
+                    [1] = "revive",
+                    [2] = char
+                }
+                ReplicatedStorage:WaitForChild("remotes"):WaitForChild("actions"):FireServer(unpack(args))
+            end
         end
     end
 end
@@ -543,34 +551,42 @@ end
 local function startLoop()
     loopThread = task.spawn(function()
         while loopRunning do
-            local ping = getPing()
-            local pingIsHigh = ping >= 1000
-
-            if pingIsHigh ~= lastPingHigh then
-                if pingIsHigh then
-                    print("High Ping! Using wait(1)")
-                    if renderConnection then renderConnection:Disconnect() renderConnection = nil end
-                else
-                    print("Low Ping! Using RenderStepped")
-                    if not renderConnection then
-                        renderConnection = RunService.RenderStepped:Connect(fireRevive)
+            local now = tick()
+            if now - pingCheckCooldown >= 1 then
+                pingCheckCooldown = now
+                local ping = getPing()
+                local high = ping >= 1000
+                if high ~= lastPingHigh then
+                    lastPingHigh = high
+                    if high then
+                        print("High Ping! Using wait(1)")
+                        if renderConnection then renderConnection:Disconnect() renderConnection = nil end
+                        useHeartbeat = false
+                    else
+                        print("Low Ping! Using RenderStepped")
+                        useHeartbeat = true
                     end
                 end
-                lastPingHigh = pingIsHigh
             end
 
-            if pingIsHigh then
+            if not useHeartbeat then
                 fireRevive()
                 task.wait(1)
             else
-                task.wait(1)
+                task.wait(0.1)
             end
+        end
+    end)
+
+    renderConnection = RunService.RenderStepped:Connect(function()
+        if useHeartbeat then
+            fireRevive()
         end
     end)
 end
 
 local ReviveActions = Tab:CreateToggle({
-    Name = "Auto Revive (Need Closer)",
+    Name = "Auto Revive (Tleb)",
     CurrentValue = false,
     Flag = "Toggle1",
     Callback = function(Value)
@@ -578,29 +594,9 @@ local ReviveActions = Tab:CreateToggle({
         if loopRunning then
             startLoop()
         else
-            if renderConnection then
-                renderConnection:Disconnect()
-                renderConnection = nil
-            end
+            if renderConnection then renderConnection:Disconnect() renderConnection = nil end
         end
     end,
-})
-
-Tab:CreateButton({
-Name = "Unavailable",
-Callback = function()
-end,
-})
-
-Tab:CreateButton({
-Name = "Dead right now",
-Callback = function()
-local args = {
-    [1] = "drown"
-}
-
-game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("actions"):FireServer(unpack(args))
-end,
 })
 
 Tab:CreateButton({
