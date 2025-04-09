@@ -27,6 +27,25 @@ player.CharacterAdded:Connect(function()
     task.spawn(enableClimbing)
 end)
 
+task.spawn(function()
+local g = Instance.new("ScreenGui", game.CoreGui)
+local t = Instance.new("TextLabel", g)
+
+t.Size = UDim2.new(0, 200, 0, 50)
+t.Position = UDim2.new(1, -210, 1, -60)
+t.BackgroundTransparency = 1
+t.TextSize = 20
+t.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local p = game.Players.LocalPlayer.Name
+
+while wait(0.1) do
+if game:GetService("ReplicatedStorage").displayPlayers:FindFirstChild(p) then
+local v = game:GetService("ReplicatedStorage").displayPlayers.Neoxhackbiem13.stats.revives.Value
+t.Text = v
+end
+end
+end)
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
