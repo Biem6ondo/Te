@@ -862,7 +862,7 @@ local Shadow_homingAttackState_attacking = Tab:CreateToggle({
 
 local ToggleActive = false
 local Shadow_boostState_landed = Tab:CreateToggle({
-   Name = "Spam BoostState: Landed / Make Everyone Has Camera Shake (Shadow)",
+   Name = "Spam BoostState: Landed / Make Everyone Has Camera Shake / Not Work Player Disabled CameraShake (Shadow)",
    CurrentValue = false,
    Flag = "Toggle1",
    Callback = function(Value)
@@ -1097,7 +1097,7 @@ local ToggleHeatWave = Tab:CreateToggle({
 })
 
 local ToggleOrb = Tab:CreateToggle({
-    Name = "Blaze (Spam Orb Abilities / Can't Stun)",
+    Name = "Sliver (Spam Orb Abilities / Can't Stun)",
     CurrentValue = false,
     Flag = "toggle_orb",
     Callback = function(Value)
