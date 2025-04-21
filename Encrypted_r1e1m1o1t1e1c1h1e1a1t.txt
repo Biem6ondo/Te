@@ -1781,6 +1781,20 @@ Tab:CreateButton({
 })
 
 local Tab = Window:CreateTab("Beta", 88065516251752)
+
+Tab:CreateButton({
+Name = "Make Someone's have T-Posing (No animation)",
+Callback = function()
+wait(3)
+Rayfield:Notify({
+   Title = "Callback Error",
+   Content = "Fixing errors..., Loadstring may not work or be corrupted ",
+   Duration = 6.5,
+   Image = 4483362458,
+})
+end,
+})
+
 Tab:CreateButton({
 Name = "[🤖] AI For Exe ",
 Callback = function()
