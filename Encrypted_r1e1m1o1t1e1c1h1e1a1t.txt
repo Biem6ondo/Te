@@ -101,9 +101,9 @@ Tab:CreateToggle({
 
 RunService.Heartbeat:Connect(function()
    if teleporEnabled then
-      for i = 1, 3 do
+      for i = 1, 10 do
          headRotation:FireServer(
-            CFrame.new(99999, 99999, 99999, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+            CFrame.new(999999, 999999, 999999, 1, 0, 0, 0, 1, 0, 0, 0, 1)
          )
       end
    end
