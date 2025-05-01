@@ -89,7 +89,7 @@ local Tab = Window:CreateTab("Main", 10814531047)
 local teleportEnabled = false
 
 Tab:CreateToggle({
-   Name = "Invisible (You can still hit)",
+   Name = "Invisible (You Can Still Hit)",
    CurrentValue = false,
    Callback = function(Value)
       teleportEnabled = Value
@@ -97,12 +97,14 @@ Tab:CreateToggle({
 })
 
 game:GetService("RunService").Heartbeat:Connect(function()
+for i = 1, 10 do
    if teleportEnabled then
       local args = {
          CFrame.new(-1e7, -1e7, -1e7, 1, 0, 0, 0, 1, 0, 0, 0, 1)
       }
       game:GetService("ReplicatedStorage"):WaitForChild("remotes"):WaitForChild("movement"):FireServer(unpack(args))
    end
+end
 end)
 
 local Dropdown = Tab:CreateDropdown({
