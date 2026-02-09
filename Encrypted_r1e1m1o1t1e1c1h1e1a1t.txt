@@ -1,5 +1,5 @@
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "",
-    Text = "The Game Actually Down Because Copyright, I Fell Bad",
+    Text = "The Game Actually Down Because Copyright, I Feel Bad",
     Duration = 5
 })
